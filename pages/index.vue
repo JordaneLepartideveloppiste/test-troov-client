@@ -4,9 +4,8 @@
     <div class="w-1/3 flex flex-col justify-center py-12 px-12">
       <div class="">
 
-        <div>
-          <h2 class="mt-6 text-3xl font-bold text-gray-900">Se connecter</h2>
-        </div>
+        <h2 class="mt-6 text-3xl font-bold text-gray-900">Se connecter</h2>
+  
 
         <div class="mt-8">
 
@@ -51,6 +50,7 @@ export default {
             title: process.env.name + " | Connexion",
             typeButton: "primary",
             sizeButton: "large",
+            
             form: {
                 email: "",
                 password: "",
