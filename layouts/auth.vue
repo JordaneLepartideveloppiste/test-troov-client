@@ -1,6 +1,7 @@
 <template>
     <div>
       <TopList />
+      <SideProfil />
       <Nuxt />
       <FootList />
     </div>
@@ -8,6 +9,7 @@
   
   <script>
   import FootList from '~/components/FootList.vue';
+import SideProfil from '~/components/SideProfil.vue';
   import TopList from '../components/TopList.vue';
   export default {
   
@@ -18,6 +20,6 @@
               }
           };
       },
-      components: { TopList, FootList }
+      components: { TopList, FootList, SideProfil }
   }
   </script>

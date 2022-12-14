@@ -15,6 +15,15 @@ export default {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
+  server: {
+    port: 3000,
+  },
+
+  env: {
+    API_BASE_URL: process.env.API_BASE_URL,
+    API_KEY_PUBLIC: process.env.API_KEY_PUBLIC,
+    API_KEY_PRIVATE: process.env.API_KEY_PRIVATE,
+  },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
@@ -45,9 +54,9 @@ export default {
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
+    '@nuxtjs/auth-next',
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    '@nuxtjs/auth-next',
     '@nuxtjs/moment'
   ],
 
@@ -61,15 +70,18 @@ export default {
     strategies: {
       local: {
         token: {
-          property: 'body.token',
+          property: "data.token",
+          global: true,
+          required: true,
+          type: "Bearer",
         },
         user: {
-          property: 'body',
+          property: 'data',
         },
         endpoints: {
-          login: { url: '/login', method: 'post' },
-          logout: { url: '/logout', method: 'delete' },
-          user: { url: '/users/things', method: 'get' }
+          login: { url: '/session', method: 'post' },
+          logout: { url: '/session', method: 'delete' },
+          user: { url: '/user', method: 'get' }
         }
       }
     },
@@ -79,10 +91,6 @@ export default {
       callback: '/',
       home: '/dashboard'
     }
-  },
-
-  router: {
-    middleware: ['auth']
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

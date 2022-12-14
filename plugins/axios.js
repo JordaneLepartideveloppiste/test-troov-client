@@ -4,11 +4,11 @@ const PUBLIC_KEY = process.env.API_KEY_PUBLIC
 const PRIVATE_KEY = process.env.API_KEY_PRIVATE
 
 
-export default function ({ $auth, $axios, redirect}, inject) {
+export default function ({ $auth, $axios, redirect}) {
   $axios.onRequest(config => {
 
     const method = config.method.toUpperCase();
-    const uri = "/" + config.url;
+    const uri = "/api" + config.url;
     const datetime = new Date().toISOString();
 
     const CONCAT = method + uri + datetime;
