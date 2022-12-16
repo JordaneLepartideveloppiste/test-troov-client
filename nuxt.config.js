@@ -15,6 +15,15 @@ export default {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
+  server: {
+    port: 3000,
+  },
+
+  env: {
+    API_BASE_URL: process.env.API_BASE_URL,
+    API_KEY_PUBLIC: process.env.API_KEY_PUBLIC,
+    API_KEY_PRIVATE: process.env.API_KEY_PRIVATE,
+  },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
@@ -23,6 +32,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '~/plugins/axios',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -31,21 +41,58 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     // https://go.nuxtjs.dev/tailwindcss
-    '@nuxt/postcss8'
+    '@nuxt/postcss8',
+    '@nuxtjs/moment',
+    '@nuxtjs/dotenv'
     
   ],
 
+  moment: {
+    defaultLocale: 'fr',
+    locales: ['fr']
+  },
+
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
+    '@nuxtjs/auth-next',
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/moment'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: '/',
+    baseURL: process.env.API_BASE_URL,
   },
+
+  auth: {
+    strategies: {
+      local: {
+        token: {
+          property: "token",
+        },
+        user: {
+          property: false,
+          autoFetch: true
+        },
+        endpoints: {
+          login: { url: '/session', method: 'post' },
+          logout: { url: '/session', method: 'delete' },
+          user: { url: '/user', method: 'get'}
+        }
+      }
+    },
+    redirect: {
+      login: '/',
+      logout: '/',
+      callback: '/',
+      home: '/dashboard'
+    }
+  },
+
+
+
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
