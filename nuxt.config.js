@@ -70,18 +70,16 @@ export default {
     strategies: {
       local: {
         token: {
-          property: "data.token",
-          global: true,
-          required: true,
-          type: "Bearer",
+          property: "token",
         },
         user: {
-          property: 'data',
+          property: false,
+          autoFetch: true
         },
         endpoints: {
           login: { url: '/session', method: 'post' },
           logout: { url: '/session', method: 'delete' },
-          user: { url: '/user', method: 'get' }
+          user: { url: '/user', method: 'get'}
         }
       }
     },
@@ -92,6 +90,9 @@ export default {
       home: '/dashboard'
     }
   },
+
+
+
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {

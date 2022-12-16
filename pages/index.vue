@@ -1,8 +1,12 @@
 <template>
 
   <div class="min-h-screen flex">
-    <div class="w-1/3 flex flex-col justify-center py-12 px-12">
-
+    <div class="w-1/3 flex flex-col justify-center pb-12 px-12">
+      <div class="flex items-center border border-sky-700 bg-sky-600 rounded-full w-3/4 pl-4 pr-8 py-3 my-12">
+      
+      <img src="/img/logo.png" alt="logo" width="20%">
+      <span class="text-4xl text-white">Troov List</span>
+      </div>
 
         <h2 v-if="onLogin" class="mt-6 text-3xl font-bold text-gray-900">Connectez-vous</h2>
         <h2 v-else class="mt-6 text-3xl font-bold text-gray-900">Créez votre compte</h2>
@@ -17,19 +21,25 @@
             </div>
             <div class="flex flex-col w-full ">
               <label for="email">Votre email</label>
-              <input id="email" name="email" class="border rounded-sm py-1 px-2 mt-2" v-model="getForm(onLogin).email" type="text"/>
+              <input v-if="onLogin" id="email" name="email" class="border rounded-sm py-1 px-2 mt-2" v-model="formLogin.email" type="text"/>
+              <input v-else id="email" name="email" class="border rounded-sm py-1 px-2 mt-2" v-model="formCreate.email" type="text"/>
             </div>
 
             <div class="flex flex-col w-full mb-8">
               <label for="password">Votre mot de passe</label>
-              <input id="password" name="password" class="border rounded-sm py-1 px-2 mt-2" @keydown.enter="submitLogin" v-model="getForm(onLogin).password" type="password"/>
+              <input v-if="onLogin" id="password" name="password" class="border rounded-sm py-1 px-2 mt-2" v-model="formLogin.password" type="password"/>
+              <div v-else class="m-0">
+                <input id="password" name="password" class=" w-full border rounded-sm py-1 px-2 mt-2" v-model="formCreate.password" type="password"/>
+                <p class="text-gray-400 text-sm">( 8 caractères minimum )</p>
+              </div>
+              
             </div>
             <div classs="flex flex-col">
-              <button v-if="onLogin" class="border border-transparent text-white bg-sky-600 hover:bg-sky-700 px-4 py-2 rounded " @click="submitLogin">Se connecter</button>
-              <button v-else  class="border border-transparent text-white bg-sky-600 hover:bg-sky-700 px-4 py-2 rounded " @click="submitSignup">S'inscrire</button>
+              <button v-if="onLogin" class="text-white bg-sky-600 hover:bg-sky-700 px-4 py-2 rounded " @click="submitLogin">Se connecter</button>
+              <button v-else  class="text-white bg-sky-600 hover:bg-sky-700 px-4 py-2 rounded " @click="submitCreate">S'inscrire</button>
             </div>
-            <p class="color-danger text-small" v-if="formLogin.message">{{formLogin.message}}</p>
-            <p class="color-danger text-small" v-if="formCreate.message">{{formCreate.message}}</p>
+            <p class="text-small text-rose-700" v-if="onLogin && formLogin.message">{{formLogin.message}}</p>
+            <p class="text-small text-rose-700" v-if="!onLogin && formCreate.message">{{formCreate.message}}</p>
 
             <p v-if="onLogin" class="text-sm text-slate-500 text-center">Pas encore de compte ? <span @click="onLogin = false" class="hover:text-black cursor-pointer">Créer un compte</span></p>
             <p v-else class="text-sm text-slate-500 text-center">Vous avez déjà un compte ? <span @click="onLogin = true" class="hover:text-black cursor-pointer">Connectez-vous</span></p>
@@ -44,12 +54,11 @@
 </template>
 
 <script>
-import ButtonStyled from '~/components/ButtonStyled.vue';
 
 
 export default {
     name: "Connexion",
-    layout: "empty",
+    layout: "EmptyLayout",
     auth: false,
     data() {
         return {
@@ -79,19 +88,42 @@ export default {
     },
     methods: {
         async submitLogin() {
-          this.$auth.loginWith('local', {data: this.form}).then(async () => {
-        this.$router.push('/dashboard')
-      }).catch(err => {
-        console.log(err)
-        if(err.response.status === 401) return this.formLogin.message = 'Email ou mot de passe incorrect';
-      })
-        },
-        getForm(ctx) {
-          if(!ctx) {
-            return this.formCreate
-          }
-          return this.formLogin
+          const user = {
+          email: this.formLogin.email,
+          password: this.formLogin.password
         }
+    
+            this.$auth.loginWith('local', {data: user}).then(_ => {
+          this.$router.push('/dashboard')
+        }).catch(err => {
+              if(err.message.includes('401') ) return this.formLogin.message = 'Email ou mot de passe incorrect';
+              if(err.message.includes('402')) return this.formLogin.message = 'Le mot de passe doit contenir au moins une majuscule et un chiffre.';
+              if(err.message.includes('403')) return this.formLogin.message = 'Votre email ne semble pas au bon format.';
+          })
+          
+            
+        },
+      submitCreate() {
+          if (this.formCreate.name === "" || this.formCreate.email === "" || this.formCreate.password === "") {
+            return this.formCreate.message = 'Merci de remplir tous les champs'
+          }
+          this.$axios.$post('/user/signup', this.formCreate).then(_ => {
+         
+        const user = {
+          email: this.formCreate.email,
+          password: this.formCreate.password
+        }
+
+        this.$auth.loginWith('local', {data: user}).then(_ => {
+          this.$router.push('/dashboard')
+        }).catch(err => {
+            if(err.message.includes('401')) return this.formCreate.message = 'Email ou mot de passe incorrect.';
+            if(err.message.includes('402')) return this.formCreate.message = 'Le mot de passe doit contenir au moins une majuscule et un chiffre.';
+            if(err.message.includes('403')) return this.formCreate.message = 'Votre email ne correspond pas.';
+            if(err.message.includes('409')) return this.formCreate.message = 'Il semblerait que vous ayez déjà un compte chez nous';
+          })
+        })    
     },
+  }
 }
 </script>

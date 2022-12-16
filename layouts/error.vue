@@ -11,7 +11,7 @@
             </div>
             <div class="mt-8 flex justify-center">
             <nuxt-link to="/dashboard" class="text-decoration-none">
-              <ButtonStyled :size="sizeButton" :type="typeButton" class="button-brand-two py-1 px-2">Revenir à l'accueil</ButtonStyled>
+              <button class="text-white bg-sky-600 hover:bg-sky-700 px-4 py-2 rounded ">Revenir à l'accueil</button>
             </nuxt-link>
           </div>
     </div>
@@ -19,19 +19,8 @@
   </template>
   
   <script>
-import ButtonStyled from '~/components/ButtonStyled.vue';
-
-  
   export default {
-    props: ["error"],
-    layout: "empty",
-    data() {
-        return {
-            sizeButton: 'large',
-            typeButton: 'primary'
-        }
-    },
-    components: { ButtonStyled }
-};
+
+  }
   </script>
   
